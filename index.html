@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laundry Hub - Sistem Informasi Layanan Laundry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ========================================== -->
+  <!-- 1. VIEW LOGIN MULTI-ROLE                   -->
+  <!-- ========================================== -->
+  <div id="view-login" class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="logo-icon">🧺</div>
+        <h2>Laundry Hub</h2>
+        <p>Welcome back! Please login.</p>
+      </div>
+
+      <!-- Quick Role Hint Buttons (Sangat Mempermudah Pengujian Dosen & Pengguna) -->
+      <div style="margin-bottom: 16px; background: rgba(99, 102, 241, 0.1); border: 1px dashed var(--border-color); border-radius: 8px; padding: 10px;">
+        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600;">⚡ KLIK CEPAT AKUN PENGUJIAN:</div>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <button type="button" class="btn btn-sm btn-secondary" onclick="quickFillLogin('admin', 'admin123')">👑 Admin</button>
+          <button type="button" class="btn btn-sm btn-secondary" onclick="quickFillLogin('taufiq', 'kurir123')">🛵 Kurir</button>
+          <button type="button" class="btn btn-sm btn-secondary" onclick="quickFillLogin('budi', 'budi123')">👤 Pelanggan</button>
+        </div>
+      </div>
+
+      <form id="form-login" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label" for="login-username">Username</label>
+          <input type="text" id="login-username" class="form-control" placeholder="Masukkan username" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label class="form-label" for="login-password" style="margin-bottom: 0;">Password</label>
+            <a href="javascript:void(0)" onclick="switchAuthView('forgot')" style="font-size: 12px; color: #818cf8; font-weight: 500;">Lupa Password?</a>
+          </div>
+          <input type="password" id="login-password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 20px;">Login</button>
+      </form>
+
+      <div style="text-align: center; margin-top: 20px; font-size: 13px;">
+        <span class="text-muted">Don't have an account?</span>
+        <a href="javascript:void(0)" onclick="switchAuthView('register')" style="font-weight: 600; margin-left: 4px;">Register as Customer</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 2. VIEW REGISTER CUSTOMER                  -->
+  <!-- ========================================== -->
+  <div id="view-register" class="auth-wrapper" style="display: none;">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="logo-icon">✨</div>
+        <h2>Register</h2>
+        <p>Join our laundry service today.</p>
+      </div>
+
+      <form id="form-register" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" id="reg-fullname" class="form-control" placeholder="Nama Lengkap" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="text" id="reg-phone" class="form-control" placeholder="08xxxxxxxxxx" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Address</label>
+          <textarea id="reg-address" class="form-control" placeholder="Alamat lengkap penjemputan" required></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <input type="text" id="reg-username" class="form-control" placeholder="Username unik" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="reg-password" class="form-control" placeholder="••••••••" required autocomplete="new-password">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 10px;">Create Account</button>
+      </form>
+
+      <div style="text-align: center; margin-top: 18px; font-size: 13px;">
+        <span class="text-muted">Already have an account?</span>
+        <a href="javascript:void(0)" onclick="switchAuthView('login')" style="font-weight: 600; margin-left: 4px;">Login</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 2.1 VIEW RESET / LUPA PASSWORD             -->
+  <!-- ========================================== -->
+  <div id="view-forgot" class="auth-wrapper" style="display: none;">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="logo-icon">🔑</div>
+        <h2>Reset Password</h2>
+        <p>Masukkan username & nomor HP terdaftar untuk membuat password baru.</p>
+      </div>
+
+      <form id="form-forgot" onsubmit="handleForgotPassword(event)">
+        <div class="form-group">
+          <label class="form-label">Username Akun</label>
+          <input type="text" id="forgot-username" class="form-control" placeholder="Contoh: budi" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nomor Handphone Terdaftar</label>
+          <input type="text" id="forgot-phone" class="form-control" placeholder="Contoh: 0895725677902" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password Baru</label>
+          <input type="password" id="forgot-new-password" class="form-control" placeholder="••••••••" required autocomplete="new-password">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Konfirmasi Password Baru</label>
+          <input type="password" id="forgot-confirm-password" class="form-control" placeholder="••••••••" required autocomplete="new-password">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 16px;">Simpan Password Baru</button>
+      </form>
+
+      <div style="text-align: center; margin-top: 18px; font-size: 13px;">
+        <span class="text-muted">Ingat password Anda?</span>
+        <a href="javascript:void(0)" onclick="switchAuthView('login')" style="font-weight: 600; margin-left: 4px;">Kembali ke Login</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 3. VIEW UTAMA (DASHBOARD APLIKASI)        -->
+  <!-- ========================================== -->
+  <div id="view-app" class="app-container" style="display: none;">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div style="font-size: 26px;">🧺</div>
+        <div>
+          <div class="sidebar-brand-name">Laundry Hub</div>
+          <span id="badge-role" class="sidebar-role-tag">ROLE</span>
+        </div>
+      </div>
+
+      <!-- NAVIGASI DINAMIS SESUAI ROLE -->
+      <nav id="sidebar-nav" class="sidebar-nav">
+        <!-- Rendered by JS -->
+      </nav>
+
+      <!-- SIDEBAR FOOTER (PROFIL & LOGOUT) -->
+      <div class="sidebar-footer">
+        <div class="user-info-box">
+          <div id="user-avatar" class="user-avatar">U</div>
+          <div class="user-meta">
+            <div id="user-display-name" class="user-name">User Name</div>
+            <div id="user-display-role" class="user-role">Role</div>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm btn-block" onclick="handleLogout()">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="main-content">
+      
+      <!-- ================================================== -->
+      <!-- A. SECTIONS UNTUK ROLE CUSTOMER                   -->
+      <!-- ================================================== -->
+      <!-- A1. Customer Dashboard: Form Buat Pesanan Baru (Gambar 3.44) -->
+      <section id="sec-cust-dashboard" class="content-section" style="display: none;">
+        <div class="page-header">
+          <h1 class="page-title">Selamat Datang, <span class="cust-welcome-name">Pelanggan</span>!</h1>
+          <p class="page-subtitle">Pesan layanan laundry Anda dengan mudah di sini.</p>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">Buat Pesanan Baru</h2>
+          <form id="form-cust-order" onsubmit="handleCustomerCreateOrder(event)">
+            <div class="form-group">
+              <label class="form-label">Alamat Penjemputan</label>
+              <textarea id="cust-order-address" class="form-control" rows="2" required placeholder="Contoh: Bekasi, regensi 1 blok j5 no 46"></textarea>
+              <small style="color: var(--text-dim); font-size: 11px; margin-top: 4px; display: block;">*Ubah di menu Edit Profil jika ingin mengganti alamat tersimpan.</small>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label">Nama Pelanggan</label>
+                <input type="text" id="cust-order-name" class="form-control" disabled>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Nomor HP (Penjemputan)</label>
+                <input type="text" id="cust-order-phone" class="form-control" disabled>
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label">Jenis Layanan</label>
+                <select id="cust-order-layanan" class="form-control" required>
+                  <!-- Diisi options oleh JS -->
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Metode Pembayaran</label>
+                <select id="cust-order-payment" class="form-control" required>
+                  <option value="Tunai">Tunai (Cash)</option>
+                  <option value="QRIS">QRIS</option>
+                  <option value="Transfer Bank">Transfer Bank</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="margin-top: 12px; padding: 12px 28px;">
+              Pesan Sekarang
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- A2. Customer: Riwayat Pesanan Saya (Gambar 3.45) -->
+      <section id="sec-cust-riwayat" class="content-section" style="display: none;">
+        <div class="page-header">
+          <h1 class="page-title">Selamat Datang, <span class="cust-welcome-name">Pelanggan</span>!</h1>
+          <p class="page-subtitle">Pesan layanan laundry Anda dengan mudah di sini.</p>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">Riwayat Pesanan Saya</h2>
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Layanan</th>
+                  <th>Berat</th>
+                  <th>Total Harga</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="table-cust-orders">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================== -->
+      <!-- B. SECTIONS UNTUK ROLE KURIR                      -->
+      <!-- ================================================== -->
+      <!-- B1. Kurir Dashboard: Tugas & Pesanan Tersedia (Gambar 3.49) -->
+      <section id="sec-kurir-dashboard" class="content-section" style="display: none;">
+        <div class="page-header">
+          <h1 class="page-title">Selamat Datang, <span id="kurir-welcome-name">Kurir</span>!</h1>
+          <p class="page-subtitle">Kelola tugas penjemputan dan input berat laundry.</p>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">Tugas & Pesanan Tersedia</h2>
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Pelanggan</th>
+                  <th>HP / Alamat</th>
+                  <th>Layanan</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="table-kurir-tasks">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- B2. Kurir: Riwayat Tugas Saya (Selesai) (Gambar 3.50) -->
+      <section id="sec-kurir-riwayat" class="content-section" style="display: none;">
+        <div class="page-header">
+          <h1 class="page-title">Selamat Datang, <span id="kurir-welcome-name-2">Kurir</span>!</h1>
+          <p class="page-subtitle">Kelola tugas penjemputan dan input berat laundry.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span>Riwayat Tugas Saya (Selesai)</span>
+            <div class="card-header-actions">
+              <input type="date" id="filter-kurir-date" class="form-control" style="width: auto; padding: 6px 10px;">
+              <button class="btn btn-primary btn-sm" onclick="filterKurirHistory()">Filter Hari</button>
+              <button class="btn btn-secondary btn-sm" onclick="resetKurirHistoryFilter()">Reset</button>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Pelanggan</th>
+                  <th>Layanan</th>
+                  <th>Berat</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="table-kurir-history">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================== -->
+      <!-- C. SECTIONS UNTUK ROLE ADMIN                      -->
+      <!-- ================================================== -->
+      <!-- C1. Admin Dashboard: All System Orders (Gambar 3.52) -->
+      <section id="sec-admin-dashboard" class="content-section" style="display: none;">
+        <div class="page-header">
+          <h1 class="page-title">Selamat Datang, <span id="admin-welcome-name">Admin</span>!</h1>
+          <p class="page-subtitle">Berikut adalah ringkasan operasional laundry hari ini.</p>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">All System Orders</h2>
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Customer</th>
+                  <th>Service</th>
+                  <th>Courier</th>
+                  <th>Total Harga</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="table-admin-orders">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- C2. Admin: Kelola Kurir (Gambar 3.54) -->
+      <section id="sec-admin-kurir" class="content-section" style="display: none;">
+        <div class="page-header">
+          <h1 class="page-title">Selamat Datang, <span class="admin-name-span">Admin</span>!</h1>
+          <p class="page-subtitle">Berikut adalah ringkasan operasional laundry hari ini.</p>
+        </div>
+
+        <div class="form-grid-2">
+          <!-- Form Daftarkan Kurir Baru -->
+          <div class="card">
+            <h2 class="card-title">Daftarkan Kurir Baru</h2>
+            <form id="form-add-kurir" onsubmit="handleAddKurir(event)">
+              <div class="form-group">
+                <label class="form-label">Nama Lengkap</label>
+                <input type="text" id="new-kurir-name" class="form-control" placeholder="Ahmad Slamet" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Nomor HP</label>
+                <input type="text" id="new-kurir-phone" class="form-control" placeholder="08xxxxxxxxx" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Plat Nomor</label>
+                <input type="text" id="new-kurir-plat" class="form-control" placeholder="B 1234 ABC" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Username</label>
+                <input type="text" id="new-kurir-username" class="form-control" placeholder="username_kurir" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" id="new-kurir-password" class="form-control" placeholder="••••••••" required>
+              </div>
+              <button type="submit" class="btn btn-primary btn-block">Simpan Data Kurir</button>
+            </form>
+          </div>
+
+          <!-- Daftar Kurir Aktif -->
+          <div class="card">
+            <h2 class="card-title">Daftar Kurir Aktif</h2>
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Nama</th>
+                    <th>Username</th>
+                    <th>No. HP</th>
+                    <th>Plat No</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="table-admin-kurirs">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- C3. Admin: Kelola Layanan (Gambar 3.53) -->
+      <section id="sec-admin-layanan" class="content-section" style="display: none;">
+        <div class="page-header">
+          <h1 class="page-title">Selamat Datang, <span class="admin-name-span">Admin</span>!</h1>
+          <p class="page-subtitle">Berikut adalah ringkasan operasional laundry hari ini.</p>
+        </div>
+
+        <div class="form-grid-2">
+          <!-- Form Tambah/Edit Layanan -->
+          <div class="card">
+            <h2 class="card-title" id="title-form-layanan">Kelola Jenis Layanan</h2>
+            <form id="form-manage-layanan" onsubmit="handleSaveLayanan(event)">
+              <input type="hidden" id="edit-layanan-id">
+              <div class="form-group">
+                <label class="form-label">Nama Layanan</label>
+                <input type="text" id="layanan-name" class="form-control" placeholder="Contoh: Cuci Karpet" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Harga per Kg (Rp)</label>
+                <input type="number" id="layanan-price" class="form-control" placeholder="10000" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Estimasi Waktu</label>
+                <input type="text" id="layanan-estimasi" class="form-control" placeholder="Contoh: 2 Hari" value="2 Hari" required>
+              </div>
+              <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button type="submit" class="btn btn-primary" id="btn-save-layanan" style="flex: 1;">Simpan Layanan</button>
+                <button type="button" class="btn btn-secondary" onclick="resetLayananForm()" id="btn-cancel-layanan">Batal</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Daftar Layanan Saat Ini -->
+          <div class="card">
+            <h2 class="card-title">Daftar Layanan Saat Ini</h2>
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Nama Layanan</th>
+                    <th>Harga</th>
+                    <th>Estimasi</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="table-admin-layanan">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- C4. Admin: Laporan Transaksi & Grafik (Gambar 3.56) -->
+      <section id="sec-admin-laporan" class="content-section" style="display: none;">
+        <div class="page-header">
+          <h1 class="page-title">Laporan Transaksi Selesai</h1>
+          <p class="page-subtitle">Rekapitulasi total pesanan dan akumulasi pendapatan operasional.</p>
+        </div>
+
+        <div class="card">
+          <!-- Filter Tanggal & Export Excel -->
+          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <input type="date" id="laporan-from-date" class="form-control" style="width: auto;">
+              <span style="color: var(--text-muted); font-size: 13px;">s/d</span>
+              <input type="date" id="laporan-to-date" class="form-control" style="width: auto;">
+              <button class="btn btn-primary btn-sm" onclick="filterLaporan()">Filter</button>
+              <button class="btn btn-secondary btn-sm" onclick="resetFilterLaporan()">Reset</button>
+            </div>
+            <div>
+              <button class="btn btn-success btn-sm" onclick="exportLaporanToExcel()">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Export Excel
+              </button>
+            </div>
+          </div>
+
+          <!-- Grafik Pendapatan Harian Canvas -->
+          <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 20px; margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div style="font-size: 13px; font-weight: 700; color: #34d399; display: flex; align-items: center; gap: 8px;">
+                <span style="display: inline-block; width: 10px; height: 10px; background-color: #34d399; border-radius: 2px;"></span>
+                Pendapatan Harian (Rp)
+              </div>
+              <div id="stat-total-pendapatan" style="font-size: 16px; font-weight: 800; color: #fff;">Total: Rp 0</div>
+            </div>
+            <canvas id="chartPendapatan" height="90" style="width: 100%; max-height: 220px;"></canvas>
+          </div>
+
+          <!-- Tabel Laporan Transaksi Selesai -->
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Customer</th>
+                  <th>Layanan</th>
+                  <th>Berat</th>
+                  <th>Total Pendapatan</th>
+                </tr>
+              </thead>
+              <tbody id="table-admin-laporan">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================== -->
+      <!-- D. SECTIONS BERSAMA (CHAT & EDIT PROFIL)           -->
+      <!-- ================================================== -->
+      <!-- D1. Fitur Live Chat (Gambar 3.47 & Gambar 3.55) -->
+      <section id="sec-shared-chat" class="content-section" style="display: none;">
+        <div class="page-header">
+          <h1 class="page-title">Live Chat Laundry</h1>
+          <p class="page-subtitle">Saluran komunikasi interaktif pelanggan dengan admin laundry.</p>
+        </div>
+
+        <div class="chat-container">
+          <!-- Sidebar Kontak (terlihat jika Admin) -->
+          <div class="chat-sidebar" id="admin-chat-sidebar">
+            <div class="chat-sidebar-title">Kontak Pelanggan</div>
+            <div class="chat-user-list" id="chat-customer-list">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+          <!-- Chat Room Area -->
+          <div class="chat-area">
+            <div class="chat-header">
+              <div class="user-avatar" style="width: 32px; height: 32px; font-size: 12px;">💬</div>
+              <div>
+                <div id="chat-with-name" style="font-weight: 700; font-size: 14px;">Admin Laundry</div>
+                <div style="font-size: 11px; color: #34d399;">● Online</div>
+              </div>
+            </div>
+            <div class="chat-messages" id="chat-messages-box">
+              <!-- Bubble Chat by JS -->
+            </div>
+            <form class="chat-input-bar" onsubmit="handleSendChatMessage(event)">
+              <input type="text" id="chat-input-text" class="form-control" placeholder="Tulis pesan..." required autocomplete="off">
+              <button type="submit" class="btn btn-primary" style="padding: 10px 20px;">Kirim</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- D2. Edit Profil -->
+      <section id="sec-shared-profile" class="content-section" style="display: none;">
+        <div class="page-header">
+          <h1 class="page-title">Edit Profil</h1>
+          <p class="page-subtitle">Perbarui data informasi akun Anda.</p>
+        </div>
+
+        <div class="card" style="max-width: 600px;">
+          <form id="form-edit-profile" onsubmit="handleUpdateProfile(event)">
+            <div class="form-group">
+              <label class="form-label">Nama Lengkap</label>
+              <input type="text" id="profile-name" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nomor Handphone</label>
+              <input type="text" id="profile-phone" class="form-control" required>
+            </div>
+            <div class="form-group" id="profile-group-address">
+              <label class="form-label">Alamat Rumah</label>
+              <textarea id="profile-address" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="form-group" id="profile-group-plat" style="display: none;">
+              <label class="form-label">Plat Nomor Kendaraan</label>
+              <input type="text" id="profile-plat" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Ganti Password (Opsional)</label>
+              <input type="password" id="profile-password" class="form-control" placeholder="Kosongkan jika tidak ingin mengubah password">
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Simpan Perubahan</button>
+          </form>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ================================================== -->
+  <!-- MODAL: STRUK DIGITAL RESI (Gambar 3.46 & 3.58)     -->
+  <!-- ================================================== -->
+  <div id="strukModal" class="modal-overlay">
+    <div class="receipt-card">
+      <div class="receipt-header">
+        <div class="receipt-icon">🧺</div>
+        <h3>LAUNDRY HUB</h3>
+        <p>Terima kasih telah mempercayakan pakaian Anda!</p>
+      </div>
+      <div class="receipt-body">
+        <div class="receipt-row">
+          <span class="label">No. Pesanan</span>
+          <span class="val" id="rec-id">#LD-29</span>
+        </div>
+        <div class="receipt-row">
+          <span class="label">Tanggal</span>
+          <span class="val" id="rec-date">23/5/2026, 07.12.58</span>
+        </div>
+
+        <div class="receipt-divider"></div>
+
+        <div class="receipt-row">
+          <span class="label" id="rec-service-name">Express (1 Hari)</span>
+          <span class="val" id="rec-weight">4.00 kg</span>
+        </div>
+        <div class="receipt-row">
+          <span class="label">Harga per kg</span>
+          <span class="val" id="rec-price-kg">Rp 15.000</span>
+        </div>
+        <div class="receipt-row" id="row-rec-biaya-antar" style="display: none;">
+          <span class="label">Biaya Antar Jemput</span>
+          <span class="val" id="rec-biaya-antar">Rp 10.000</span>
+        </div>
+
+        <div class="receipt-divider"></div>
+
+        <div class="receipt-total">
+          <span class="title">TOTAL BAYAR</span>
+          <span class="amount" id="rec-total">Rp 60.000</span>
+        </div>
+
+        <div class="receipt-row">
+          <span class="label">METODE BAYAR</span>
+          <span class="val" id="rec-payment-method">Tunai</span>
+        </div>
+
+        <div class="receipt-divider"></div>
+
+        <div class="receipt-row" style="font-size: 12px;">
+          <span class="label">Pelanggan:</span>
+          <span class="val" id="rec-cust-name">Budi Santoso</span>
+        </div>
+        <div class="receipt-row" style="font-size: 12px;">
+          <span class="label">Kurir:</span>
+          <span class="val" id="rec-kurir-name">Muhammad Taufiq</span>
+        </div>
+        <div class="receipt-row" style="font-size: 12px;">
+          <span class="label">Admin:</span>
+          <span class="val" id="rec-admin-name">Suci Admin</span>
+        </div>
+      </div>
+      <div class="receipt-footer-actions">
+        <button type="button" class="btn btn-primary btn-block" onclick="window.print()">Cetak Struk</button>
+        <button type="button" class="btn btn-secondary btn-block" onclick="closeReceiptModal()">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================== -->
+  <!-- MODAL: KURIR INPUT BERAT & PEMBAYARAN              -->
+  <!-- ================================================== -->
+  <div id="kurirModal" class="modal-overlay">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="kurir-modal-title" style="font-size: 17px; font-weight: 700;">Input Berat Cucian & Pembayaran</h3>
+        <button type="button" onclick="closeKurirModal()" style="background: none; border: none; color: #fff; font-size: 20px; cursor: pointer;">&times;</button>
+      </div>
+      <form id="form-kurir-modal" onsubmit="handleKurirModalSubmit(event)">
+        <input type="hidden" id="km-order-id">
+        <div class="form-group">
+          <label class="form-label">No. Pesanan</label>
+          <input type="text" id="km-order-display" class="form-control" disabled>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Pelanggan</label>
+          <input type="text" id="km-customer-name" class="form-control" disabled>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Berat Aktual Cucian (Kg)</label>
+          <input type="number" step="0.1" id="km-weight" class="form-control" placeholder="Contoh: 4.5" required oninput="calcKurirTotalPreview()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Pilihan Metode Pembayaran</label>
+          <select id="km-payment" class="form-control" required>
+            <option value="Tunai">Tunai (Cash)</option>
+            <option value="QRIS">QRIS</option>
+            <option value="Transfer Bank">Transfer Bank</option>
+          </select>
+        </div>
+        <div style="background: var(--bg-main); padding: 12px; border-radius: var(--radius-sm); margin-bottom: 16px; border: 1px solid var(--border-color);">
+          <div style="font-size: 12px; color: var(--text-muted);">Estimasi Total Tagihan:</div>
+          <div id="km-preview-total" style="font-size: 18px; font-weight: 800; color: #34d399;">Rp 0</div>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button type="submit" class="btn btn-primary" style="flex: 1;">Konfirmasi & Simpan</button>
+          <button type="button" class="btn btn-secondary" onclick="closeKurirModal()">Batal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================================================== -->
+  <!-- MODAL: ADMIN UPDATE STATUS PESANAN                 -->
+  <!-- ================================================== -->
+  <div id="adminStatusModal" class="modal-overlay">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 style="font-size: 17px; font-weight: 700;">Ubah Status Pesanan</h3>
+        <button type="button" onclick="closeAdminStatusModal()" style="background: none; border: none; color: #fff; font-size: 20px; cursor: pointer;">&times;</button>
+      </div>
+      <form id="form-admin-status" onsubmit="handleAdminStatusSubmit(event)">
+        <input type="hidden" id="asm-order-id">
+        <div class="form-group">
+          <label class="form-label">No. Pesanan</label>
+          <input type="text" id="asm-order-display" class="form-control" disabled>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status Saat Ini</label>
+          <select id="asm-new-status" class="form-control" required>
+            <option value="Menunggu Kurir">Menunggu Kurir</option>
+            <option value="Diproses">Diproses</option>
+            <option value="Siap Diantar">Siap Diantar</option>
+            <option value="Selesai">Selesai</option>
+          </select>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 16px;">
+          <button type="submit" class="btn btn-primary" style="flex: 1;">Simpan Status</button>
+          <button type="button" class="btn btn-secondary" onclick="closeAdminStatusModal()">Batal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container"></div>
+
+  <!-- SCRIPTS -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
